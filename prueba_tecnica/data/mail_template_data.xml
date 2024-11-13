@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <data>
+
+        <record model="mail.template" id="email_sale_summary">
+            <field name="name">Resumen de orden de venta {{object.name}}</field>
+            <field name="model_id" ref="prueba_tecnica.model_sale_order"></field>
+            <field name="email_from">{{(object.user_id.email_formatted or user.email_formatted)}}</field>
+            <field name="email_to">{{object.partner_id.email_formatted}}</field>
+            <field name="subject">Resumen {{object.name}}</field>
+            <field name="auto_delete" eval="False"></field>
+            <field name="body_html" type="html">
+                <div>
+                    <p> Estimado <t t-out="object.partner_id.display_name" />
+                    </p>
+                    <p>Se ha confirmado la orden de venta con el folio <t t-out="object.name" /></p>
+                    <p>La fecha tentativa de entrega es: <b t-field='object.delivery_date' /></p>
+
+                    <h5>Resumen de Orden de Venta</h5>
+                    <div>
+                        <p>
+                            <i>Fecha de la orden: <span t-field='object.date_order' /></i>
+                        </p>
+                        <p>
+                            <i>Lista de precios: <span t-out='object.pricelist_id.name' /></i>
+                        </p>
+                        <p>
+                            <i>Vendedor: <span t-out='object.user_id.name' /></i>
+                        </p>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Product</th>
+                                <th scope="col">Cantidad</th>
+                                <th scope="col">Precio Unitario</th>
+                                <th scope="col">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-set="lines"
+                                t-value="object.order_line.filtered(lambda line: line.display_type == False)" />
+                            <t t-foreach="lines" t-as="line">
+                                <tr>
+                                    <td>
+                                        <span t-out="line.product_template_id.name" />
+                                    </td>
+                                    <td>
+                                        <span t-out="line.product_uom_qty" />
+                                    </td>
+                                    <td>
+                                        <span t-field="line.price_unit" />
+                                    </td>
+                                    <td>
+                                        <span t-field="line.price_subtotal" />
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                    <p>
+                        ---
+                    </p>
+                    <p>
+                        <span t-field='object.user_id.partner_id.display_name' />
+                    </p>
+                </div>
+            </field>
+
+        </record>
+
+    </data>
+
+
+</odoo>
